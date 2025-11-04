@@ -31,10 +31,10 @@ app.post('/api/server', (req, res) => {
     const now = new Date();
     const vietnamTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
 
-    const createDate = dateFormat(vietnamTime, "yyyymmddHHMMss");
+    const createDate = dateFormat(vietnamTime, "yyyyMMddHHmmss");
     const expireDate = dateFormat(
         new Date(vietnamTime.getTime() + 15 * 60 * 1000),
-        "yyyymmddHHMMss"
+        "yyyyMMddHHmmss"
     );
 
 
