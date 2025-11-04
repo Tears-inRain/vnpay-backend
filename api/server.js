@@ -55,8 +55,8 @@ app.post('/api/server', (req, res) => {
     let signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
     vnp_Params['vnp_SecureHash'] = signed;
 
-    let paymentUrl = vnp_Url + '?' + qs.stringify(vnp_Params, { encode: false });
-
+    let paymentUrl = vnp_Url + '?' + querystring.stringify(vnp_Params);
+    
     console.log("Created URL: ", paymentUrl);
     res.status(200).json({ url: paymentUrl });
 });
