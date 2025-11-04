@@ -50,12 +50,13 @@ app.post('/api/server', (req, res) => {
         return acc;
     }, {});
 
+    // DÒNG SỬA ĐÚNG:
     let signData = qs.stringify(sortedParams, { encode: false });
     let hmac = crypto.createHmac('sha512', secretKey);
     let signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
     vnp_Params['vnp_SecureHash'] = signed;
 
-    let paymentUrl = vnp_Url + '?' + querystring.stringify(vnp_Params);
+    let paymentUrl = vnp_Url + '?' + qs.stringify(vnp_Params);
 
     console.log("Created URL: ", paymentUrl);
     res.status(200).json({ url: paymentUrl });
