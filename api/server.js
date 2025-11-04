@@ -27,15 +27,14 @@ app.post('/api/server', (req, res) => {
         return res.status(400).json({ error: "Missing totalPrice" });
     }
 
-    // --- Fix timezone chuẩn GMT+7 ---
-    let now = new Date();
-    let vietnamTime = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+    // --- Fix timezone & cộng giờ, phút đúng chuẩn ---
+    const now = new Date();
+    const vietnamTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
 
-    // Thời gian tạo đơn hàng
-    let createDate = dateFormat(vietnamTime, 'yyyymmddHHmmss');
-    let expireDate = dateFormat(
-    new Date(vietnamTime.getTime() + 15 * 60 * 1000),
-    'yyyymmddHHmmss'
+    const createDate = dateFormat(vietnamTime, "yyyymmddHHMMss");
+    const expireDate = dateFormat(
+        new Date(vietnamTime.getTime() + 15 * 60 * 1000),
+        "yyyymmddHHMMss"
     );
 
 
