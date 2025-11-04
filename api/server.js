@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 // --- THÔNG TIN CẤU HÌNH ---
 const vnp_TmnCode = 'Y18IGTHF';
-const vnp_HashSecret = 'KQ6V4KNVKM0K93MO7QEUZHHP4DIZMBDY';
+const vnp_HashSecret = 'KQ6V4KNVKM0K93MO7QEUZHHP4DIZMBDY'; // Key MỚI
 const vnp_Url = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
 
 // ⛔️ DÙNG URL ĐÃ ĐĂNG KÝ TRÊN SANDBOX (ĐỂ FIX LỖI CHỮ KÝ) ⛔️
@@ -26,7 +26,7 @@ app.post('/api/server', (req, res) => {
         return res.status(400).json({ error: "Missing totalPrice" });
     }
 
-    // --- SỬA LỖI TIMEZONE (GMT+7) ---
+    // --- Sửa lỗi Timezone (GMT+7) ---
     let now = new Date();
     let GTM_PLUS_7 = 7 * 60 * 60 * 1000;
     let gmt7Time = new Date(now.getTime() + GTM_PLUS_7);
@@ -34,8 +34,8 @@ app.post('/api/server', (req, res) => {
     // 1. TẠO THỜI GIAN TẠO (CREATE DATE)
     let createDate = dateFormat(gmt7Time, 'UTC:yyyymmddHHmmss');
     
-    // 2. ⛔️ TẠO THỜI GIAN HẾT HẠN (EXPIRE DATE) ⛔️
-    // Thêm 15 phút vào thời gian GMT+7
+    // 2. ⛔️ TẠO THỜI GIAN HẾT HẠN (EXPIRE DATE) 15 PHÚT ⛔️
+    // Thêm 15 phút (15 * 60 * 1000)
     let expireTime = new Date(gmt7Time.getTime() + 15 * 60 * 1000);
     // Dùng biến "expireTime" mới
     let expireDate = dateFormat(expireTime, 'UTC:yyyymmddHHmmss');
@@ -61,7 +61,7 @@ app.post('/api/server', (req, res) => {
     vnp_Params['vnp_IpAddr'] = ipAddr;
     vnp_Params['vnp_CreateDate'] = createDate;
     
-    // 3. ⛔️ ĐẢM BẢO BẠN DÙNG ĐÚNG BIẾN "expireDate" ⛔️
+    // 3. ĐẢM BẢO DÙNG ĐÚNG BIẾN "expireDate"
     vnp_Params['vnp_ExpireDate'] = expireDate;
 
     // Sắp xếp params
@@ -70,14 +70,14 @@ app.post('/api/server', (req, res) => {
         return acc;
     }, {});
 
-    // Logic Hashing của NodeJS
+    // Logic Hashing của NodeJS (encode: false)
     let signData = qs.stringify(sortedParams, { encode: false });
     let hmac = crypto.createHmac('sha512', secretKey);
     let signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
     sortedParams['vnp_SecureHash'] = signed;
 
-    // URL cuối cùng
+    // URL cuối cùng (encode: true - mặc định)
     let paymentUrl = vnp_Url + '?' + qs.stringify(sortedParams);
     
     console.log("Created URL: ", paymentUrl);
