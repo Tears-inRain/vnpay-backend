@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 // ⛔️ THAY THẾ BẰNG THÔNG TIN CỦA BẠN ⛔️
 const vnp_TmnCode = 'Y18IGTHF'; // Lấy từ VNPay
-const vnp_HashSecret = '9FHNIRXI1NJFFU61ERSTA29S2RYU1YQS'; // Lấy từ VNPay
+const vnp_HashSecret = 'KQ6V4KNVKM0K93MO7QEUZHHP4DIZMBDY'; // Lấy từ VNPay
 const vnp_Url = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
 const vnp_ReturnUrl = 'prm392project://payment/result'; // Deep Link của app
 
@@ -56,7 +56,7 @@ app.post('/api/server', (req, res) => {
     vnp_Params['vnp_SecureHash'] = signed;
 
     let paymentUrl = vnp_Url + '?' + querystring.stringify(vnp_Params);
-    
+
     console.log("Created URL: ", paymentUrl);
     res.status(200).json({ url: paymentUrl });
 });
