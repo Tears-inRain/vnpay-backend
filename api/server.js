@@ -40,12 +40,13 @@ app.post('/api/server', (req, res) => {
 
 
     // Mã đơn hàng (theo giờ phút giây)
-    let orderId = dateFormat(vietnamTime, 'HHMMss');
+    let orderId = dateFormat(vietnamTime, 'HHmmss');
     let tmnCode = vnp_TmnCode;
     let secretKey = vnp_HashSecret;
     let returnUrl = vnp_ReturnUrl;
     let ipAddr = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-
+    console.log("createDate:", createDate);
+    console.log("expireDate:", expireDate);
     let vnp_Params = {};
     vnp_Params['vnp_Version'] = '2.1.0';
     vnp_Params['vnp_Command'] = 'pay';
