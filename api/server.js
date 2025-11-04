@@ -2,7 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
-const dateFormat = require('dateformat'); // Đã sửa lỗi dateformat phiên bản 4
+const dateFormat = require('dateformat');
 const qs = require('qs');
 const cors = require('cors');
 
@@ -24,20 +24,13 @@ app.post('/api/server', (req, res) => {
         return res.status(400).json({ error: "Missing totalPrice" });
     }
 
-    // --- ⛔️ PHẦN SỬA LỖI THỜI GIAN (TIMEZONE) ⛔️ ---
-    // Lấy thời gian UTC hiện tại
+    // Sửa lỗi Timezone (GMT+7)
     let now = new Date();
-    // Offset của GMT+7 là 7 giờ * 60 phút * 60 giây * 1000ms
     let GTM_PLUS_7 = 7 * 60 * 60 * 1000;
-    // Tạo đối tượng Date mới bằng cách thêm offset GMT+7
     let gmt7Time = new Date(now.getTime() + GTM_PLUS_7);
-
-    // Dùng 'dateFormat' với cờ "UTC:" để nó "in" ra thời gian GMT+7
-    // mà không áp dụng múi giờ của server (cũng là UTC)
     let createDate = dateFormat(gmt7Time, 'UTC:yyyymmddHHmmss');
     let orderId = dateFormat(gmt7Time, 'UTC:HHmmss');
-    // --- KẾT THÚC PHẦN SỬA LỖI ---
-
+    
     let tmnCode = vnp_TmnCode;
     let secretKey = vnp_HashSecret;
     let returnUrl = vnp_ReturnUrl;
@@ -55,7 +48,7 @@ app.post('/api/server', (req, res) => {
     vnp_Params['vnp_Amount'] = amount * 100;
     vnp_Params['vnp_ReturnUrl'] = returnUrl;
     vnp_Params['vnp_IpAddr'] = ipAddr;
-    vnp_Params['vnp_CreateDate'] = createDate; // ✅ Bây giờ là giờ GMT+7
+    vnp_Params['vnp_CreateDate'] = createDate;
 
     // Sắp xếp params
     let sortedParams = Object.keys(vnp_Params).sort().reduce((acc, key) => {
@@ -63,17 +56,40 @@ app.post('/api/server', (req, res) => {
         return acc;
     }, {});
 
-    // Tạo chuỗi query cho signData (KHÔNG mã hóa)
-    let signData = qs.stringify(sortedParams, { encode: false }); // Đã sửa 'querystring' thành 'qs'
+    // --- ⛔️ PHẦN SỬA LỖI HASHING (THEO CODE JAVA) ⛔️ ---
+    // 1. Tạo chuỗi query (đã mã hóa) cho URL cuối cùng
+    // Dùng 'qs.stringify' với encode: true (mặc định)
+    let queryUrl = qs.stringify(sortedParams, { encode: true });
+
+    // 2. Tạo chuỗi signData (cũng phải mã hóa, nhưng theo cách của VNPay)
+    // 'qs' với `encode: false` là SAI. Chúng ta phải làm thủ công.
+    let signData = '';
+    for (let key in sortedParams) {
+        if (sortedParams.hasOwnProperty(key)) {
+            // Chỉ mã hóa giá trị (value), không mã hóa key
+            // Dùng encodeURIComponent thay vì qs.stringify
+            let encodedValue = encodeURIComponent(sortedParams[key]);
+            
+            // Fix các ký tự đặc biệt mà VNPay không mã hóa
+            // (Lỗi này của VNPay, nhưng chúng ta phải theo)
+            encodedValue = encodedValue.replace(/%20/g, "+");
+            
+            if (signData.length === 0) {
+                signData += `${key}=${encodedValue}`;
+            } else {
+                signData += `&${key}=${encodedValue}`;
+            }
+        }
+    }
+    // --- KẾT THÚC PHẦN SỬA LỖI HASHING ---
 
     // Tạo chữ ký
     let hmac = crypto.createHmac('sha512', secretKey);
     let signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
-    vnp_Params['vnp_SecureHash'] = signed;
-
-    // Tạo URL thanh toán (Mã hóa - default)
-    let paymentUrl = vnp_Url + '?' + qs.stringify(vnp_Params); // Đã sửa 'querystring' thành 'qs'
-
+    
+    // URL thanh toán cuối cùng
+    let paymentUrl = vnp_Url + '?' + queryUrl + '&vnp_SecureHash=' + signed;
+    
     console.log("Created URL: ", paymentUrl);
     res.status(200).json({ url: paymentUrl });
 });
