@@ -18,7 +18,7 @@ const vnp_Url = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
 const vnp_ReturnUrl = 'prm392project://payment/result'; // Deep Link của app
 
 // API Endpoint (đường dẫn)
-app.post('/api/server', (req, res) => {
+app.post('/', (req, res) => {
     let amount = req.body.totalPrice;
     if (!amount) {
         return res.status(400).json({ error: "Missing totalPrice" });
