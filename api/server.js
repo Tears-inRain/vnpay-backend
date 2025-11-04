@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 // --- THÔNG TIN CẤU HÌNH ---
 // ⚠️ Lưu ý: phải trùng với cấu hình trong tài khoản sandbox VNPAY
 const vnp_TmnCode = 'Y18IGTHF';
-const vnp_HashSecret = 'KQ6V4KNVKM0K93MO7QEUZHHP4DIZMBDY';
+const vnp_HashSecret = 'KQ6V4KNVKM8K93MO7QEUZHHP4DIZMBDY';
 const vnp_Url = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
 
 // ⚠️ Nếu deploy trên Vercel, hãy thay localhost bằng domain thật của bạn
