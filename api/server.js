@@ -18,7 +18,7 @@ const vnp_HashSecret = 'KQ6V4KNVKM8K93MO7QEUZHHP4DIZMBDY';
 const vnp_Url = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
 
 // ⚠️ Nếu deploy trên Vercel, hãy thay localhost bằng domain thật của bạn
-const vnp_ReturnUrl = 'https://prm392project.com/payment/result';
+const vnp_ReturnUrl = 'https://multispiral-hamular-bettina.ngrok-free.dev/payment/result';
 
 // API Endpoint
 app.post('/api/server', (req, res) => {
@@ -82,3 +82,8 @@ app.post('/api/server', (req, res) => {
 
 // Xuất app cho Vercel
 module.exports = app;
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
+
+console.log('✅ Server starting at', new Date().toLocaleString());
