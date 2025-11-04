@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 // --- THÔNG TIN CẤU HÌNH ---
 const vnp_TmnCode = 'Y18IGTHF';
-const vnp_HashSecret = 'KQ6V4KNVKM0K93MO7QEUZHHP4DIZMBDY'; // Key MỚI
+const vnp_HashSecret = 'KQ6V4KNVKM0K93MO7QEUZHHP4DIZMBDY';
 const vnp_Url = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
 
 // ⛔️ DÙNG URL ĐÃ ĐĂNG KÝ TRÊN SANDBOX (ĐỂ FIX LỖI CHỮ KÝ) ⛔️
