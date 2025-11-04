@@ -11,7 +11,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// ⛔️ THÔNG TIN CẤU HÌNH (Đã đúng) ⛔️
+// --- THÔNG TIN CẤU HÌNH (Đã đúng) ---
 const vnp_TmnCode = 'Y18IGTHF';
 const vnp_HashSecret = 'KQ6V4KNVKM0K93MO7QEUZHHP4DIZMBDY'; // Key MỚI
 const vnp_Url = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html';
@@ -24,7 +24,7 @@ app.post('/api/server', (req, res) => {
         return res.status(400).json({ error: "Missing totalPrice" });
     }
 
-    // Sửa lỗi Timezone (GMT+7)
+    // --- Sửa lỗi Timezone (GMT+7) ---
     let now = new Date();
     let GTM_PLUS_7 = 7 * 60 * 60 * 1000;
     let gmt7Time = new Date(now.getTime() + GTM_PLUS_7);
@@ -56,39 +56,19 @@ app.post('/api/server', (req, res) => {
         return acc;
     }, {});
 
-    // --- ⛔️ PHẦN SỬA LỖI HASHING (THEO CODE JAVA) ⛔️ ---
-    // 1. Tạo chuỗi query (đã mã hóa) cho URL cuối cùng
-    // Dùng 'qs.stringify' với encode: true (mặc định)
-    let queryUrl = qs.stringify(sortedParams, { encode: true });
-
-    // 2. Tạo chuỗi signData (cũng phải mã hóa, nhưng theo cách của VNPay)
-    // 'qs' với `encode: false` là SAI. Chúng ta phải làm thủ công.
-    let signData = '';
-    for (let key in sortedParams) {
-        if (sortedParams.hasOwnProperty(key)) {
-            // Chỉ mã hóa giá trị (value), không mã hóa key
-            // Dùng encodeURIComponent thay vì qs.stringify
-            let encodedValue = encodeURIComponent(sortedParams[key]);
-            
-            // Fix các ký tự đặc biệt mà VNPay không mã hóa
-            // (Lỗi này của VNPay, nhưng chúng ta phải theo)
-            encodedValue = encodedValue.replace(/%20/g, "+");
-            
-            if (signData.length === 0) {
-                signData += `${key}=${encodedValue}`;
-            } else {
-                signData += `&${key}=${encodedValue}`;
-            }
-        }
-    }
-    // --- KẾT THÚC PHẦN SỬA LỖI HASHING ---
+    // --- ⛔️ QUAY LẠI LOGIC HASH CỦA NODEJS DEMO ⛔️ ---
+    // Chuỗi signData (để hash) KHÔNG được mã hóa
+    let signData = qs.stringify(sortedParams, { encode: false });
 
     // Tạo chữ ký
     let hmac = crypto.createHmac('sha512', secretKey);
     let signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
-    
-    // URL thanh toán cuối cùng
-    let paymentUrl = vnp_Url + '?' + queryUrl + '&vnp_SecureHash=' + signed;
+
+    // Thêm chữ ký vào params (dùng sortedParams)
+    sortedParams['vnp_SecureHash'] = signed;
+
+    // --- URL cuối cùng PHẢI được mã hóa (mặc định của qs) ---
+    let paymentUrl = vnp_Url + '?' + qs.stringify(sortedParams);
     
     console.log("Created URL: ", paymentUrl);
     res.status(200).json({ url: paymentUrl });
