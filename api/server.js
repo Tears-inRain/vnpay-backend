@@ -32,13 +32,12 @@ app.post('/api/server', (req, res) => {
     let vietnamTime = new Date(now.getTime() + 7 * 60 * 60 * 1000);
 
     // Thời gian tạo đơn hàng
-    let createDate = dateFormat(vietnamTime, 'yyyymmddHHMMss');
-
-    // Thời gian hết hạn (sau 15 phút)
+    let createDate = dateFormat(vietnamTime, 'yyyymmddHHmmss');
     let expireDate = dateFormat(
-        new Date(vietnamTime.getTime() + 15 * 60 * 1000),
-        'yyyymmddHHMMss'
+    new Date(vietnamTime.getTime() + 15 * 60 * 1000),
+    'yyyymmddHHmmss'
     );
+
 
     // Mã đơn hàng (theo giờ phút giây)
     let orderId = dateFormat(vietnamTime, 'HHMMss');
