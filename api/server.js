@@ -27,19 +27,22 @@ app.post('/api/server', (req, res) => {
         return res.status(400).json({ error: "Missing totalPrice" });
     }
 
-    // --- Fix timezone & cộng giờ, phút đúng chuẩn ---
-    const now = new Date();
-    const vietnamTime = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" }));
+    let now = new Date();
+    // Offset của GMT+7 là 7 giờ * 60 phút * 60 giây * 1000ms
+    let GTM_PLUS_7 = 7 * 60 * 60 * 1000;
+    // Tạo Date object mới với thời gian GMT+7
+    let gmt7Time = new Date(now.getTime() + GTM_PLUS_7);
 
-    const createDate = dateFormat(vietnamTime, "yyyyMMddHHmmss");
-    const expireDate = dateFormat(
-        new Date(vietnamTime.getTime() + 15 * 60 * 1000),
-        "yyyyMMddHHmmss"
-    );
+    // 1. TẠO THỜI GIAN TẠO (CREATE DATE)
+    // Dùng 'UTC:' để in ra thời gian gmt7Time mà không bị server đổi múi giờ
+    let createDate = dateFormat(gmt7Time, 'UTC:yyyyMMddHHmmss');
+    
+    // 2. TẠO THỜI GIAN HẾT HẠN (EXPIRE DATE) 15 PHÚT
+    let expireTime = new Date(gmt7Time.getTime() + 15 * 60 * 1000);
+    let expireDate = dateFormat(expireTime, 'UTC:yyyyMMddHHmmss');
+    // --- KẾT THÚC SỬA LỖI ---
 
-
-    // Mã đơn hàng (theo giờ phút giây)
-    let orderId = dateFormat(vietnamTime, 'HHmmss');
+    let orderId = dateFormat(gmt7Time, 'UTC:HHmmss');
     let tmnCode = vnp_TmnCode;
     let secretKey = vnp_HashSecret;
     let returnUrl = vnp_ReturnUrl;
