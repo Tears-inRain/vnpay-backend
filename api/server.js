@@ -36,14 +36,14 @@ app.post('/api/server', (req, res) => {
     // 1. TẠO THỜI GIAN TẠO (CREATE DATE)
     // Dùng 'UTC:' để in ra thời gian gmt7Time mà không bị server đổi múi giờ
     //let createDate = dateFormat(gmt7Time, 'UTC:yyyyMMddHHmmss');
-    let createDate = dateFormat(gmt7Time, 'UTC:yyyymmddHHMMss');
+    let createDate = dateFormat(gmt7Time, 'UTC:yyyyMMddHHmmss');
     
     // 2. TẠO THỜI GIAN HẾT HẠN (EXPIRE DATE) 15 PHÚT
     let expireTime = new Date(gmt7Time.getTime() + 15 * 60 * 1000);
-    let expireDate = dateFormat(expireTime, 'UTC:yyyymmddHHMMss');
+    let expireDate = dateFormat(expireTime, 'UTC:yyyyMMddHHmmss');
     // --- KẾT THÚC SỬA LỖI ---
 
-    let orderId = dateFormat(gmt7Time, 'UTC:HHMMss');
+    let orderId = dateFormat(gmt7Time, 'UTC:HHmmss');
     let tmnCode = vnp_TmnCode;
     let secretKey = vnp_HashSecret;
     let returnUrl = vnp_ReturnUrl;
